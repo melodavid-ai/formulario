@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test: ¿Qué tipo de diseñador de políticas eres?</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --blue: #3266ad;
+    --green: #1D9E75;
+    --amber: #BA7517;
+    --bg: #f8f7f4;
+    --surface: #ffffff;
+    --border: rgba(0,0,0,0.1);
+    --text: #1a1a1a;
+    --muted: #6b6b6b;
+    --radius: 12px;
+  }
+  body { font-family: Georgia, 'Times New Roman', serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 2rem 1rem 4rem; }
+  .wrap { max-width: 680px; margin: 0 auto; }
+  .header { margin-bottom: 2rem; border-bottom: 2px solid var(--text); padding-bottom: 1.25rem; }
+  .header h1 { font-size: 26px; font-weight: 700; line-height: 1.3; margin-bottom: .4rem; }
+  .header p { font-size: 14px; color: var(--muted); font-style: italic; }
+  .instrucciones { background: #eef3fa; border-left: 3px solid var(--blue); padding: .85rem 1rem; border-radius: 0 8px 8px 0; margin-bottom: 1.75rem; font-size: 13px; color: #2a4a7f; line-height: 1.7; font-family: Arial, sans-serif; }
+  .bloque { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.4rem; margin-bottom: 1rem; }
+  .bloque-titulo { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin-bottom: 1.1rem; padding-bottom: .6rem; border-bottom: 1px solid var(--border); font-family: Arial, sans-serif; }
+  .pregunta { margin-bottom: 1.4rem; }
+  .pregunta:last-child { margin-bottom: 0; }
+  .pregunta-texto { font-size: 15px; line-height: 1.55; margin-bottom: .75rem; }
+  .num { font-weight: 700; color: var(--blue); margin-right: 5px; }
+  .likert { display: flex; gap: 8px; }
+  .opt { display: flex; flex-direction: column; align-items: center; flex: 1; }
+  .opt input[type=radio] { display: none; }
+  .opt label { width: 38px; height: 38px; border-radius: 50%; border: 1.5px solid #ccc; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--muted); cursor: pointer; transition: all .15s; font-family: Arial, sans-serif; background: var(--bg); }
+  .opt input:checked + label { background: var(--blue); border-color: var(--blue); color: #fff; }
+  .opt label:hover { border-color: var(--blue); color: var(--blue); }
+  .likert-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-top: 5px; font-family: Arial, sans-serif; }
+  .acciones { margin-top: 1.75rem; display: flex; flex-direction: column; gap: .75rem; }
+  .btn-calc { padding: 15px; background: var(--blue); color: #fff; border: none; border-radius: var(--radius); font-size: 16px; font-weight: 700; cursor: pointer; font-family: Arial, sans-serif; letter-spacing: .02em; }
+  .btn-calc:hover { background: #2756a0; }
+  .btn-reset { padding: 11px; background: transparent; color: var(--muted); border: 1px solid var(--border); border-radius: var(--radius); font-size: 14px; cursor: pointer; font-family: Arial, sans-serif; }
+  .btn-reset:hover { background: #eee; }
+  .err { color: #c0392b; font-size: 13px; font-family: Arial, sans-serif; display: none; margin-top: .5rem; }
+  .resultado { display: none; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 1.75rem; margin-top: 1.75rem; }
+  .badge { display: inline-block; padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; margin-bottom: 1rem; font-family: Arial, sans-serif; }
+  .res-titulo { font-size: 22px; font-weight: 700; margin-bottom: .65rem; }
+  .res-desc { font-size: 14px; color: var(--muted); line-height: 1.75; margin-bottom: 1.4rem; font-family: Arial, sans-serif; }
+  .scores { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 1.4rem; }
+  .score-card { background: var(--bg); border-radius: 8px; padding: .85rem 1rem; border: 1px solid var(--border); }
+  .score-label { font-size: 11px; color: var(--muted); margin-bottom: 4px; font-family: Arial, sans-serif; text-transform: uppercase; letter-spacing: .05em; }
+  .score-val { font-size: 24px; font-weight: 700; }
+  .barra-wrap { margin-bottom: .85rem; }
+  .barra-label { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); margin-bottom: 4px; font-family: Arial, sans-serif; }
+  .barra-bg { background: var(--bg); border-radius: 4px; height: 10px; overflow: hidden; border: 1px solid var(--border); }
+  .barra-fill { height: 10px; border-radius: 4px; transition: width .7s ease; }
+  .aviso { font-size: 13px; color: var(--muted); border-top: 1px solid var(--border); padding-top: 1rem; margin-top: .5rem; line-height: 1.65; font-family: Arial, sans-serif; font-style: italic; }
+  .footer { text-align: center; margin-top: 3rem; font-size: 11px; color: #bbb; font-family: Arial, sans-serif; }
+  @media (max-width: 480px) {
+    .scores { grid-template-columns: 1fr; }
+    .opt label { width: 32px; height: 32px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <h1>¿Qué tipo de diseñador de políticas eres?</h1>
+    <p>Instrumento de autoevaluación — Diseño de políticas públicas</p>
+  </div>
+
+  <div class="instrucciones">
+    <strong>Instrucciones:</strong> Responde cada pregunta del 1 al 5 según tu grado de acuerdo.<br>
+    <strong>1</strong> = Totalmente en desacuerdo &nbsp;·&nbsp; <strong>2</strong> = En desacuerdo &nbsp;·&nbsp; <strong>3</strong> = Neutral &nbsp;·&nbsp; <strong>4</strong> = De acuerdo &nbsp;·&nbsp; <strong>5</strong> = Totalmente de acuerdo
+  </div>
+
+  <div id="form-area"></div>
+
+  <div class="acciones">
+    <p class="err" id="err-msg">Debes responder todas las preguntas antes de calcular tu perfil.</p>
+    <button class="btn-calc" onclick="calcular()">Ver mi perfil</button>
+    <button class="btn-reset" onclick="reiniciar()">Reiniciar test</button>
+  </div>
+
+  <div class="resultado" id="resultado">
+    <div class="badge" id="badge"></div>
+    <div class="res-titulo" id="titulo"></div>
+    <div class="res-desc" id="desc"></div>
+    <div class="scores">
+      <div class="score-card">
+        <div class="score-label">Racional de mercado</div>
+        <div class="score-val" id="s-mercado" style="color:#3266ad;"></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Polis / comunidad política</div>
+        <div class="score-val" id="s-polis" style="color:#1D9E75;"></div>
+      </div>
+    </div>
+    <div class="barra-wrap">
+      <div class="barra-label"><span>Racional de mercado</span><span id="pct-m"></span></div>
+      <div class="barra-bg"><div class="barra-fill" id="bar-m" style="background:#3266ad;"></div></div>
+    </div>
+    <div class="barra-wrap">
+      <div class="barra-label"><span>Polis / comunidad</span><span id="pct-p"></span></div>
+      <div class="barra-bg"><div class="barra-fill" id="bar-p" style="background:#1D9E75;"></div></div>
+    </div>
+    <div class="aviso" id="aviso"></div>
+  </div>
+
+  <div class="footer">Instrumento académico — uso libre con fines educativos</div>
+</div>
+
+<script>
+const bloques = [
+  {titulo:"Bloque 1 — Enfoque de decisión", preguntas:[
+    {id:1, texto:"Las mejores políticas surgen del análisis técnico y modelos cuantitativos.", tipo:"M"},
+    {id:2, texto:"La legitimidad y participación ciudadana son tan importantes como la eficiencia.", tipo:"P"}
+  ]},
+  {titulo:"Bloque 2 — Mercado vs. comunidad", preguntas:[
+    {id:3, texto:"El mercado es el mejor mecanismo para organizar la sociedad.", tipo:"M"},
+    {id:4, texto:"Las comunidades pueden organizar soluciones sin depender del mercado.", tipo:"P"}
+  ]},
+  {titulo:"Bloque 3 — Visión del Estado", preguntas:[
+    {id:5, texto:"El Estado debe diseñar políticas como un optimizador de resultados.", tipo:"M"},
+    {id:6, texto:"El Estado debe facilitar espacios de deliberación y participación ciudadana.", tipo:"P"}
+  ]},
+  {titulo:"Bloque 4 — Valores y motivaciones", preguntas:[
+    {id:7, texto:"Los incentivos económicos explican la mayoría de los comportamientos sociales.", tipo:"M"},
+    {id:8, texto:"Los valores colectivos y culturales deben guiar las decisiones públicas.", tipo:"P"}
+  ]},
+  {titulo:"Bloque 5 — Evaluación de políticas", preguntas:[
+    {id:9, texto:"Las políticas deben evaluarse principalmente por indicadores cuantificables.", tipo:"M"},
+    {id:10, texto:"La calidad de una política depende también de cómo se decide y de quién participa.", tipo:"P"}
+  ]}
+];
+
+const fa = document.getElementById('form-area');
+bloques.forEach(b => {
+  let html = `<div class="bloque"><div class="bloque-titulo">${b.titulo}</div>`;
+  b.preguntas.forEach(p => {
+    html += `<div class="pregunta">
+      <div class="pregunta-texto"><span class="num">${p.id}.</span>${p.texto}</div>
+      <div class="likert">`;
+    for (let v = 1; v <= 5; v++) {
+      html += `<div class="opt"><input type="radio" name="p${p.id}" id="p${p.id}v${v}" value="${v}"><label for="p${p.id}v${v}">${v}</label></div>`;
+    }
+    html += `</div><div class="likert-labels"><span>Totalmente en desacuerdo</span><span>Totalmente de acuerdo</span></div></div>`;
+  });
+  html += `</div>`;
+  fa.innerHTML += html;
+});
+
+const perfiles = {
+  M: {
+    badge: "Diseñador racional de mercado",
+    badgeBg: "#E6F1FB", badgeColor: "#3266ad",
+    titulo: "Perfil tecnocrático-económico",
+    desc: "Tu enfoque como diseñador de políticas se orienta hacia la eficiencia, la evidencia cuantitativa y los mecanismos de mercado. Confías en el análisis técnico, los modelos económicos y los incentivos racionales para explicar el comportamiento social y orientar las decisiones públicas. Tu visión del Estado es la de un optimizador que maximiza resultados medibles. Este perfil es afín a corrientes como el análisis costo-beneficio, el gerencialismo público (New Public Management) y las políticas basadas en evidencia.",
+    aviso: "Fortaleza: alta capacidad analítica y orientación a resultados. Tensión: puede subestimar la dimensión política, simbólica y participativa de las políticas."
+  },
+  P: {
+    badge: "Diseñador de comunidad política",
+    badgeBg: "#E1F5EE", badgeColor: "#1D9E75",
+    titulo: "Perfil deliberativo-comunitario",
+    desc: "Tu enfoque privilegia la participación ciudadana, la legitimidad democrática y los valores colectivos por encima de la eficiencia técnica o el mercado. Crees que las comunidades pueden organizarse autónomamente y que el Estado debe ser un facilitador de deliberación pública. Este perfil conecta con tradiciones como la democracia participativa, la teoría de la acción comunicativa (Habermas), el neo-institucionalismo y el enfoque de políticas como construcción social.",
+    aviso: "Fortaleza: alta legitimidad democrática y sensibilidad al contexto cultural. Tensión: puede requerir mayor atención a la viabilidad técnica y la eficiencia en la implementación."
+  },
+  H: {
+    badge: "Perfil híbrido / pragmático",
+    badgeBg: "#FAEEDA", badgeColor: "#BA7517",
+    titulo: "Perfil pragmático-integrador",
+    desc: "Tu perfil combina elementos de ambas tradiciones: la racionalidad técnica del diseño basado en evidencia y la sensibilidad política de la participación ciudadana. Reconoces el valor de los datos y los incentivos, pero también la importancia de la legitimidad, los valores y el contexto comunitario. Este perfil es afín al enfoque del \"diseñador reflexivo\" (Schön), la gobernanza adaptativa y las políticas de doble racionalidad (técnica + política).",
+    aviso: "Fortaleza: flexibilidad y capacidad de integrar perspectivas diversas. Oportunidad: profundizar en cuál dimensión predomina según el tipo de problema de política."
+  }
+};
+
+function calcular() {
+  let mercado = 0, polis = 0, sin = 0;
+  const tipos = {};
+  bloques.forEach(b => b.preguntas.forEach(p => tipos[p.id] = p.tipo));
+  for (let i = 1; i <= 10; i++) {
+    const sel = document.querySelector(`input[name="p${i}"]:checked`);
+    if (!sel) { sin++; } else {
+      const v = parseInt(sel.value);
+      if (tipos[i] === "M") mercado += v; else polis += v;
+    }
+  }
+  if (sin > 0) { document.getElementById('err-msg').style.display = 'block'; return; }
+  document.getElementById('err-msg').style.display = 'none';
+
+  const diff = mercado - polis;
+  let tipo = Math.abs(diff) <= 3 ? "H" : mercado > polis ? "M" : "P";
+  const p = perfiles[tipo];
+  const total = mercado + polis;
+  const pctM = Math.round((mercado / total) * 100);
+  const pctP = 100 - pctM;
+
+  const badge = document.getElementById('badge');
+  badge.textContent = p.badge;
+  badge.style.background = p.badgeBg;
+  badge.style.color = p.badgeColor;
+
+  document.getElementById('titulo').textContent = p.titulo;
+  document.getElementById('desc').textContent = p.desc;
+  document.getElementById('s-mercado').textContent = mercado + " / 25";
+  document.getElementById('s-polis').textContent = polis + " / 25";
+  document.getElementById('pct-m').textContent = pctM + "%";
+  document.getElementById('pct-p').textContent = pctP + "%";
+
+  const res = document.getElementById('resultado');
+  res.style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('bar-m').style.width = pctM + "%";
+    document.getElementById('bar-p').style.width = pctP + "%";
+  }, 50);
+  document.getElementById('aviso').textContent = p.aviso;
+  res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function reiniciar() {
+  for (let i = 1; i <= 10; i++) {
+    document.querySelectorAll(`input[name="p${i}"]`).forEach(s => s.checked = false);
+  }
+  document.getElementById('resultado').style.display = 'none';
+  document.getElementById('err-msg').style.display = 'none';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
